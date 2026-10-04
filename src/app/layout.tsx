@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import { Footer } from "@/components/footer";
 import { FooterGate } from "@/components/site-footer";
+import { RevealOnScroll } from "@/components/reveal-on-scroll";
 import "./globals.css";
 
 const inter = Inter({
@@ -39,6 +40,8 @@ export default function RootLayout({
         <FooterGate>
           <Footer />
         </FooterGate>
+        <RevealOnScroll />
+        <div className="scroll-progress" aria-hidden />
       </body>
     </html>
   );

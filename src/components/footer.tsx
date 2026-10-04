@@ -5,7 +5,7 @@ const COLUMNS: Array<{ title: string; links: Array<{ label: string; href: string
   {
     title: "Product",
     links: [
-      { label: "Plan a trip", href: "/#start" },
+      { label: "Plan a trip", href: "/plan" },
       { label: "Features", href: "/#features" },
       { label: "How it works", href: "/#how" },
       { label: "Destinations", href: "/#destinations" },
@@ -22,7 +22,7 @@ const COLUMNS: Array<{ title: string; links: Array<{ label: string; href: string
   {
     title: "Company",
     links: [
-      { label: "About the team", href: "/#team" },
+      { label: "Meet the team", href: "/team" },
       { label: "My trips", href: "/trips" },
       { label: "Log in", href: "/login" },
       { label: "Contact", href: "mailto:ema@voyagoa.com" },

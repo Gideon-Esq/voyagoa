@@ -25,7 +25,7 @@ export async function AppHeader() {
             My Trips
           </Link>
           <Link
-            href="/"
+            href="/plan"
             className="hidden items-center gap-1.5 font-semibold text-blue transition-colors hover:text-blue-dark sm:inline-flex"
           >
             <Icon name="add" className="text-[17px]" />

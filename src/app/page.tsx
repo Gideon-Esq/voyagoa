@@ -1,13 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Nav } from "@/components/nav";
-import { TripComposer } from "@/components/trip-composer";
 import { Icon } from "@/components/icon";
 import { getCurrentUser } from "@/lib/auth";
-import { aiMode } from "@/lib/ai/client";
 import { Faq } from "@/components/landing/faq";
 import { DestinationRail } from "@/components/landing/destination-rail";
 import { SocialRow } from "@/components/landing/social";
+import { TeamAvatar } from "@/components/landing/team-avatar";
+import { Wave } from "@/components/landing/wave";
+import { CountUp } from "@/components/landing/count-up";
+import { TEAM } from "@/lib/team";
 
 /** Page gutter from the design's `.shell`: 1280px max, 32px gutters. */
 function Shell({ className, children }: { className?: string; children: React.ReactNode }) {
@@ -20,16 +22,16 @@ function CenterHeading({ eyebrow, title, sub }: { eyebrow: string; title: string
   return (
     <div className="text-center">
       <span className="text-[0.68rem] font-black tracking-wide text-blue">{eyebrow}</span>
-      <h2 className="font-display text-[2rem] leading-[1.08]">{title}</h2>
-      {sub && <p className="mx-auto mt-3 max-w-[650px] text-[0.95rem] text-ink-soft">{sub}</p>}
+      <h2 className="mt-2 font-display text-[1.85rem] leading-[1.1] sm:text-[2.25rem]">{title}</h2>
+      {sub && <p className="mx-auto mt-4 max-w-[650px] text-[0.98rem] text-ink-soft">{sub}</p>}
     </div>
   );
 }
 
 const HERO_STATS = [
-  ["18 sec", "sample trip build"],
-  ["10 days", "full itinerary"],
-  ["$2.5k", "budget tracked"],
+  { to: 18, suffix: " sec", label: "sample trip build" },
+  { to: 10, suffix: " days", label: "full itinerary" },
+  { to: 2.5, prefix: "$", suffix: "k", decimals: 1, label: "budget tracked" },
 ] as const;
 
 const RAIL = [
@@ -125,27 +127,6 @@ const VOYAGOA_WAY = [
   "One intelligent workspace",
 ];
 
-const TEAM = [
-  {
-    initials: "EK",
-    name: "Ema Kings",
-    role: "Founder",
-    title: "Founder & Product Visionary",
-    email: "ema@voyagoa.com",
-    avatar: "bg-[linear-gradient(135deg,rgba(17,103,241,0.92),rgba(16,185,129,0.82))]",
-    bio: "Ema founded Voyagoa with a simple mission: make world-class travel planning accessible to everyone through AI. From product vision to user experience, Ema focuses on turning one prompt into a complete travel plan.",
-  },
-  {
-    initials: "G",
-    name: "Gideon",
-    role: "Lead Developer",
-    title: "Lead Software Engineer & AI Systems Developer",
-    email: "ema@voyagoa.com",
-    avatar: "bg-[linear-gradient(135deg,rgba(103,87,232,0.94),rgba(34,184,199,0.82))]",
-    bio: "Gideon leads the engineering behind Voyagoa, transforming ambitious product ideas into a fast, reliable, and scalable AI platform across web and mobile experiences.",
-  },
-] as const;
-
 const TESTIMONIALS = [
   { initials: "TA", name: "Tosin A.", where: "Lagos, Nigeria", quote: "I planned my entire Italy vacation in under five minutes. It saved me hours of research." },
   { initials: "DM", name: "David M.", where: "London, UK", quote: "The budget tracker kept us on target without sacrificing great experiences. Voyagoa is a game changer." },
@@ -154,7 +135,6 @@ const TESTIMONIALS = [
 
 export default async function Home() {
   const user = await getCurrentUser();
-  const demo = aiMode() === "demo";
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -162,36 +142,53 @@ export default async function Home() {
 
       <main className="flex-1">
         {/* ============================== HERO ============================== */}
-        <Shell className="grid min-h-[560px] items-center gap-11 py-10 lg:grid-cols-[minmax(360px,0.9fr)_minmax(0,1.25fr)]" >
+        <div className="relative overflow-x-clip">
+        <div className="blob blob-a" aria-hidden />
+        <div className="blob blob-b" aria-hidden />
+        <Shell className="relative grid min-h-[600px] items-center gap-14 pb-20 pt-14 sm:pt-20 lg:grid-cols-[minmax(360px,0.9fr)_minmax(0,1.25fr)]" >
           <div id="start">
-            <h1 className="animate-rise mb-4 max-w-[530px] font-display text-[2.35rem] leading-none sm:text-[3rem] xl:text-[3.75rem]">
+            <h1 className="animate-rise mb-6 max-w-[530px] font-display text-[2.35rem] leading-none sm:text-[3rem] xl:text-[3.75rem]">
               Your Entire Trip.
               <br />
-              <span className="text-blue">Planned by AI.</span>
+              <span className="text-shine">Planned by AI.</span>
             </h1>
-            <p className="animate-rise-1 mb-5 max-w-[460px] text-[1.02rem] text-[#263753]">
+            <p className="animate-rise-1 mb-8 max-w-[460px] text-[1.05rem] leading-relaxed text-[#263753]">
               Tell Voyagoa your budget, travel dates, and preferences. In seconds, get a
               complete AI-generated travel plan with flights, hotels, restaurants,
               attractions, transport, visa guidance, and a personalized itinerary.
             </p>
 
-            <div className="animate-rise-2 max-w-[455px]">
-              <TripComposer authed={!!user} />
-              {demo && (
-                <p className="mt-3 text-xs text-ink-faint">
-                  Running in demo mode (no OPENAI_API_KEY configured) — plans are sample data.
-                </p>
-              )}
+            <div className="animate-rise-2 flex max-w-[455px] flex-col gap-3 sm:flex-row">
+              <Link
+                href="/plan"
+                className="btn-shine inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-blue px-7 font-extrabold text-white shadow-[0_12px_28px_rgba(17,103,241,0.24)] transition hover:-translate-y-0.5 hover:bg-blue-dark"
+              >
+                <Icon name="auto_awesome" className="text-[18px]" />
+                Plan My Trip
+              </Link>
+              <Link
+                href="/#how"
+                className="inline-flex min-h-12 items-center justify-center rounded-full border border-line bg-white px-7 font-extrabold text-navy transition hover:-translate-y-0.5 hover:border-blue hover:text-blue"
+              >
+                See How It Works
+              </Link>
             </div>
 
-            <div className="animate-rise-2 mt-4 grid max-w-[455px] gap-2.5 sm:grid-cols-3">
-              {HERO_STATS.map(([value, label]) => (
+            <div className="animate-rise-2 mt-10 grid max-w-[455px] gap-3 sm:grid-cols-3">
+              {HERO_STATS.map((stat) => (
                 <div
-                  key={label}
-                  className="rounded-lg border border-[#dce8fb] bg-white/82 px-3.5 py-3 shadow-[0_10px_28px_rgba(12,43,97,0.07)]"
+                  key={stat.label}
+                  className="rounded-2xl border border-[#dce8fb] bg-white/82 px-3.5 py-3 shadow-[0_10px_28px_rgba(12,43,97,0.07)]"
                 >
-                  <strong className="block text-base text-navy">{value}</strong>
-                  <span className="block text-[0.68rem] font-semibold text-ink-soft">{label}</span>
+                  <strong className="block text-base text-navy">
+                    <CountUp
+                      to={stat.to}
+                      prefix={"prefix" in stat ? stat.prefix : ""}
+                      suffix={stat.suffix}
+                      decimals={"decimals" in stat ? stat.decimals : 0}
+                    />
+                  </strong>
+                  <span className="block text-[0.68rem] font-semibold text-ink-soft">{stat.label}</span>
                 </div>
               ))}
             </div>
@@ -208,20 +205,20 @@ export default async function Home() {
               }}
             />
 
-            <div className="relative grid w-[min(100%,680px)] grid-cols-[122px_1fr] overflow-hidden rounded-lg border border-line/95 bg-white/94 shadow-[0_20px_55px_rgba(12,43,97,0.13)]">
+            <div className="animate-float relative grid w-[min(100%,680px)] grid-cols-[122px_1fr] overflow-hidden rounded-2xl border border-line/95 bg-white/94 shadow-[0_20px_55px_rgba(12,43,97,0.13)]">
               <aside className="flex flex-col gap-1.5 border-r border-[#e5ecf8] bg-white/90 px-2.5 pb-3.5 pt-5">
                 <div className="mb-1.5 flex gap-1.5">
-                  <span className="grid size-8 place-items-center rounded-lg bg-white text-[#21345a] shadow-[0_6px_18px_rgba(10,22,51,0.09)]">
+                  <span className="grid size-8 place-items-center rounded-2xl bg-white text-[#21345a] shadow-[0_6px_18px_rgba(10,22,51,0.09)]">
                     <Icon name="chevron_left" className="text-sm" />
                   </span>
-                  <span className="grid size-8 place-items-center rounded-lg bg-white text-[#21345a] shadow-[0_6px_18px_rgba(10,22,51,0.09)]">
+                  <span className="grid size-8 place-items-center rounded-2xl bg-white text-[#21345a] shadow-[0_6px_18px_rgba(10,22,51,0.09)]">
                     <Icon name="search" className="text-sm" />
                   </span>
                 </div>
                 {RAIL.map(([icon, label], i) => (
                   <span
                     key={label}
-                    className={`flex min-h-[30px] items-center gap-2 rounded-[5px] px-2.5 text-[0.69rem] font-bold ${
+                    className={`flex min-h-[30px] items-center gap-2 rounded-lg px-2.5 text-[0.69rem] font-bold ${
                       i === 0 ? "bg-blue text-white" : "text-[#4d5a71]"
                     }`}
                   >
@@ -238,7 +235,7 @@ export default async function Home() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
-                  <article className="relative col-span-2 min-h-[132px] rounded-lg border border-[#e3ebf7] bg-white py-4 pl-4 pr-28 shadow-[0_8px_20px_rgba(10,22,51,0.05)]">
+                  <article className="relative col-span-2 min-h-[132px] rounded-2xl border border-[#e3ebf7] bg-white py-4 pl-4 pr-28 shadow-[0_8px_20px_rgba(10,22,51,0.05)]">
                     <span className="text-[0.75rem] text-ink-soft">Total Budget</span>
                     <strong className="mb-4 mt-1 block text-[1.75rem]">$2,500</strong>
                     <div className="mb-1.5 h-[5px] overflow-hidden rounded-full bg-[#dce7fb]">
@@ -250,7 +247,7 @@ export default async function Home() {
                     </div>
                   </article>
 
-                  <article className="overflow-hidden rounded-lg border border-[#e3ebf7] bg-white shadow-[0_8px_20px_rgba(10,22,51,0.05)]">
+                  <article className="overflow-hidden rounded-2xl border border-[#e3ebf7] bg-white shadow-[0_8px_20px_rgba(10,22,51,0.05)]">
                     <div className="relative h-[88px] w-full">
                       <Image src="/assets/bali-preview.jpg" alt="" fill className="object-cover" sizes="200px" />
                     </div>
@@ -268,7 +265,7 @@ export default async function Home() {
                   {MINI_STATS.map((s) => (
                     <article
                       key={s.title}
-                      className="grid min-h-[88px] grid-cols-[42px_1fr] content-start gap-x-2 rounded-lg border border-[#e3ebf7] bg-white p-3.5 shadow-[0_8px_20px_rgba(10,22,51,0.05)]"
+                      className="grid min-h-[88px] grid-cols-[42px_1fr] content-start gap-x-2 rounded-2xl border border-[#e3ebf7] bg-white p-3.5 shadow-[0_8px_20px_rgba(10,22,51,0.05)]"
                     >
                       <span className={`row-span-3 grid size-9 place-items-center rounded-full ${s.tone}`}>
                         <Icon name={s.icon} className="text-[20px]" />
@@ -282,7 +279,7 @@ export default async function Home() {
 
                 <div className="mt-4 flex items-center justify-between gap-5">
                   <span className="text-[0.7rem] text-ink-soft">Next: Review your itinerary</span>
-                  <span className="inline-flex min-h-[38px] items-center gap-2 rounded-lg bg-blue px-5 text-[0.84rem] font-extrabold text-white">
+                  <span className="inline-flex min-h-[38px] items-center gap-2 rounded-2xl bg-blue px-5 text-[0.84rem] font-extrabold text-white">
                     View Itinerary
                     <Icon name="arrow_forward" className="text-[17px]" />
                   </span>
@@ -291,12 +288,13 @@ export default async function Home() {
             </div>
           </div>
         </Shell>
+        </div>
 
         {/* =========================== PROOF STRIP ========================== */}
-        <Shell className="grid grid-cols-2 gap-x-4 gap-y-5 pb-8 pt-3 sm:grid-cols-3 lg:grid-cols-5">
+        <Shell className="grid grid-cols-2 gap-x-4 gap-y-8 pb-24 pt-6 sm:grid-cols-3 sm:pb-32 lg:grid-cols-5" data-reveal-stagger>
           {PROOF.map(([icon, a, b]) => (
-            <div key={a} className="flex items-center justify-start gap-2.5 text-[0.76rem] font-extrabold leading-tight text-navy sm:justify-center">
-              <Icon name={icon} className="shrink-0 text-2xl text-blue-dark" />
+            <div key={a} className="group flex items-center justify-start gap-2.5 text-[0.76rem] font-extrabold leading-tight text-navy sm:justify-center">
+              <Icon name={icon} className="icon-pop shrink-0 text-2xl text-blue-dark" />
               <span>
                 {a}
                 <br />
@@ -307,13 +305,15 @@ export default async function Home() {
         </Shell>
 
         {/* ============================= AI AT WORK ========================= */}
-        <section className="bg-[linear-gradient(90deg,rgba(237,245,255,0.9),rgba(245,249,255,0.98))] py-6">
-          <Shell className="grid min-h-[210px] items-center gap-7 lg:grid-cols-[0.9fr_0.82fr_40px_1.52fr]">
-            <div>
-              <span className="inline-flex min-h-[22px] items-center rounded-[5px] border border-[#92b9ff] bg-white/70 px-3.5 text-[0.68rem] font-black text-navy">
+        <section className="relative">
+          <Wave position="top" fill="#eef5ff" />
+          <div className="bg-[#eef5ff] py-16 sm:py-24">
+          <Shell className="grid min-h-[210px] items-center gap-8 lg:grid-cols-[0.9fr_0.82fr_40px_1.52fr]">
+            <div data-reveal>
+              <span className="inline-flex min-h-[22px] items-center rounded-lg border border-[#92b9ff] bg-white/70 px-3.5 text-[0.68rem] font-black text-navy">
                 AI AT WORK
               </span>
-              <h2 className="mt-2.5 max-w-[330px] font-display text-[2rem] leading-[1.08]">
+              <h2 className="mb-4 mt-4 max-w-[330px] font-display text-[2rem] leading-[1.08]">
                 From your request to the perfect trip.
               </h2>
               <p className="max-w-[310px] text-[0.9rem] text-[#394965]">
@@ -322,16 +322,16 @@ export default async function Home() {
               </p>
             </div>
 
-            <article className="min-h-[150px] rounded-lg bg-white p-6 shadow-[0_18px_45px_rgba(12,43,97,0.08)]">
+            <article data-reveal style={{ "--reveal-delay": "120ms" } as React.CSSProperties} className="min-h-[150px] rounded-2xl bg-white p-6 shadow-[0_18px_45px_rgba(12,43,97,0.08)]">
               <strong className="mb-4 block text-[0.84rem]">Your Request</strong>
               <p className="text-[0.98rem]">
                 I have $2,500 and 10 days. Flying from Lagos. I love beaches and nightlife.
               </p>
             </article>
 
-            <Icon name="chevron_right" className="hidden justify-self-center text-2xl text-blue lg:block" />
+            <Icon name="chevron_right" className="nudge hidden justify-self-center text-2xl text-blue lg:block" />
 
-            <article className="rounded-lg bg-white px-7 py-5 shadow-[0_18px_45px_rgba(12,43,97,0.08)]">
+            <article data-reveal style={{ "--reveal-delay": "240ms" } as React.CSSProperties} className="rounded-2xl bg-white px-7 py-5 shadow-[0_18px_45px_rgba(12,43,97,0.08)]">
               <strong className="mb-4 block text-[0.84rem]">Voyagoa is building your trip...</strong>
               <ul className="ai-sequence mb-4 grid gap-y-2.5 sm:grid-cols-2 sm:gap-x-8">
                 {BUILD_STEPS.map((step) => (
@@ -347,20 +347,22 @@ export default async function Home() {
               <span className="text-[0.84rem] font-black">Trip ready in 18 seconds</span>
             </article>
           </Shell>
+          </div>
+          <Wave position="bottom" fill="#eef5ff" />
         </section>
 
         {/* ============================= FEATURES =========================== */}
-        <Shell className="scroll-mt-20 pb-6 pt-9" >
-          <div id="features" className="scroll-mt-24">
+        <Shell className="scroll-mt-20 pb-24 pt-28 sm:pb-36 sm:pt-40">
+          <div id="features" className="scroll-mt-24" data-reveal>
             <CenterHeading eyebrow="EVERYTHING YOU NEED" title="Everything you need for the perfect trip" />
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6" data-reveal-stagger>
             {FEATURES.map((f) => (
               <article
                 key={f.title}
-                className="flex min-h-[155px] flex-col items-center justify-center rounded-lg border border-line bg-white px-3.5 py-5 text-center"
+                className="lift group flex min-h-[175px] flex-col items-center justify-center rounded-2xl border border-line bg-white px-4 py-8 text-center"
               >
-                <Icon name={f.icon} className={`mb-4 text-[38px] ${f.tone}`} />
+                <Icon name={f.icon} className={`icon-pop mb-5 text-[38px] ${f.tone}`} />
                 <h3 className="mb-2 text-[0.88rem] font-bold">{f.title}</h3>
                 <p className="text-[0.78rem] text-[#30435d]">{f.body}</p>
               </article>
@@ -369,14 +371,14 @@ export default async function Home() {
         </Shell>
 
         {/* =========================== HOW IT WORKS ========================= */}
-        <Shell className="py-5">
-          <div id="how" className="scroll-mt-24">
+        <Shell className="pb-24 sm:pb-36">
+          <div id="how" className="scroll-mt-24" data-reveal>
             <CenterHeading eyebrow="HOW IT WORKS" title="Three simple steps to your next adventure" />
           </div>
-          <div className="mt-3.5 grid items-center gap-5 lg:grid-cols-[1fr_44px_1fr_44px_1fr]">
+          <div className="mt-14 grid items-center gap-6 lg:grid-cols-[1fr_44px_1fr_44px_1fr]" data-reveal>
             {STEPS.map((step, i) => (
               <div key={step.n} className="contents">
-                <article className="relative grid min-h-[170px] grid-cols-[36px_1fr] gap-2.5 overflow-hidden rounded-lg bg-[#f4f8ff] p-5 sm:grid-cols-[36px_1fr_62px]">
+                <article className="lift group relative grid min-h-[190px] grid-cols-[36px_1fr] gap-3 overflow-hidden rounded-3xl border border-transparent bg-[#f4f8ff] p-7 sm:grid-cols-[36px_1fr_62px]">
                   <span className="grid size-[30px] place-items-center rounded-full border border-blue bg-white font-black text-blue">
                     {step.n}
                   </span>
@@ -392,11 +394,11 @@ export default async function Home() {
                   </div>
                   <Icon
                     name={step.icon}
-                    className="absolute bottom-4 right-4 grid size-[54px] place-items-center rounded-full bg-[#dfeaff] p-3.5 text-2xl text-blue opacity-55 sm:static sm:self-end sm:opacity-100"
+                    className="icon-pop absolute bottom-4 right-4 grid size-[54px] place-items-center rounded-full bg-[#dfeaff] p-3.5 text-2xl text-blue opacity-55 sm:static sm:self-end sm:opacity-100"
                   />
                 </article>
                 {i < STEPS.length - 1 && (
-                  <Icon name="arrow_right_alt" className="hidden justify-self-center text-2xl text-blue lg:block" />
+                  <Icon name="arrow_right_alt" className="nudge hidden justify-self-center text-2xl text-blue lg:block" />
                 )}
               </div>
             ))}
@@ -404,18 +406,19 @@ export default async function Home() {
         </Shell>
 
         {/* ==================== BUDGET + ITINERARY PANELS =================== */}
-        <Shell className="mt-2.5">
+        <Shell className="pb-24 sm:pb-36">
           <div
+            data-reveal
             id="budget"
-            className="grid scroll-mt-24 overflow-hidden rounded-lg border border-line bg-white lg:grid-cols-2"
+            className="grid scroll-mt-24 overflow-hidden rounded-[2rem] border border-line bg-white shadow-[0_24px_60px_rgba(12,43,97,0.06)] lg:grid-cols-2"
           >
-            <article className="min-h-[310px] border-b border-line p-7 lg:border-b-0 lg:border-r">
+            <article className="min-h-[310px] border-b border-line p-8 sm:p-10 lg:border-b-0 lg:border-r">
               <span className="text-[0.68rem] font-black text-blue">SMART BUDGET TRACKER</span>
               <h2 className="mb-6 font-display text-[1.55rem] leading-[1.08]">
                 Every dollar has a purpose
               </h2>
               <p className="mb-2 text-ink-soft">Total Budget</p>
-              <strong className="mb-3 block text-[1.75rem]">$2,500</strong>
+              <strong className="mb-3 block text-[1.75rem]"><CountUp to={2500} prefix="$" /></strong>
               <small className="mb-2 block text-ink-soft">$2,250 of $2,500 estimated</small>
               <div className="mt-5 grid items-center gap-7 sm:grid-cols-[150px_1fr]">
                 <div
@@ -436,11 +439,11 @@ export default async function Home() {
               </div>
             </article>
 
-            <article id="itinerary" className="min-h-[310px] scroll-mt-24 p-7">
+            <article id="itinerary" className="min-h-[310px] scroll-mt-24 p-8 sm:p-10">
               <span className="text-[0.68rem] font-black text-blue">DYNAMIC ITINERARY PREVIEW</span>
               <h2 className="mb-6 font-display text-[1.55rem] leading-[1.08]">Day 4 - Explore Bali</h2>
               <div className="grid gap-6 sm:grid-cols-[1fr_168px]">
-                <ol className="relative grid gap-3 pl-5 before:absolute before:bottom-2 before:left-1 before:top-2 before:w-0.5 before:bg-blue">
+                <ol className="timeline-draw relative grid gap-3 pl-5 before:absolute before:bottom-2 before:left-1 before:top-2 before:w-0.5 before:bg-blue">
                   {DAY4.map(([time, what]) => (
                     <li
                       key={time}
@@ -453,12 +456,12 @@ export default async function Home() {
                 </ol>
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-1">
                   {["dest-bali.jpg", "bali-preview.jpg", "hero-scene.jpg"].map((file, i) => (
-                    <div key={file} className="relative h-[72px] w-full overflow-hidden rounded-[7px]">
+                    <div key={file} className="group relative h-[72px] w-full overflow-hidden rounded-xl">
                       <Image
                         src={`/assets/${file}`}
                         alt={`Bali scene ${i + 1}`}
                         fill
-                        className="object-cover"
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                         sizes="168px"
                       />
                     </div>
@@ -466,8 +469,8 @@ export default async function Home() {
                 </div>
               </div>
               <Link
-                href="/#start"
-                className="mt-3 inline-flex min-h-9 items-center rounded-lg border border-blue bg-white px-4 text-[0.82rem] font-extrabold text-blue transition hover:-translate-y-px hover:bg-blue-soft"
+                href="/plan"
+                className="mt-3 inline-flex min-h-9 items-center rounded-2xl border border-blue bg-white px-4 text-[0.82rem] font-extrabold text-blue transition hover:-translate-y-px hover:bg-blue-soft"
               >
                 Regenerate Day
               </Link>
@@ -476,23 +479,25 @@ export default async function Home() {
         </Shell>
 
         {/* =========================== DESTINATIONS ========================= */}
-        <Shell className="pb-5 pt-7">
-          <div id="destinations" className="mb-3 scroll-mt-24">
+        <Shell className="pb-24 sm:pb-36">
+          <div id="destinations" className="mb-14 scroll-mt-24" data-reveal>
             <CenterHeading eyebrow="POPULAR DESTINATIONS" title="Inspiration for your next journey" />
           </div>
-          <DestinationRail />
+          <div data-reveal style={{ "--reveal-delay": "120ms" } as React.CSSProperties}>
+            <DestinationRail />
+          </div>
         </Shell>
 
         {/* ============================ COMPARISON ========================== */}
-        <Shell>
-          <div className="grid overflow-hidden rounded-lg border border-line bg-white lg:grid-cols-[1.05fr_0.95fr]">
-            <article className="p-7">
+        <Shell className="pb-24 sm:pb-36">
+          <div data-reveal className="grid overflow-hidden rounded-[2rem] border border-line bg-white shadow-[0_24px_60px_rgba(12,43,97,0.06)] lg:grid-cols-[1.05fr_0.95fr]">
+            <article className="p-8 sm:p-10">
               <h2 className="mb-4 font-display text-[1.6rem] leading-[1.08]">
                 Why travelers choose Voyagoa
               </h2>
               <div className="grid items-center gap-4 sm:grid-cols-[1fr_42px_1fr]">
                 <div>
-                  <h3 className="mb-3 flex items-center gap-2 rounded-[5px] bg-[#f4f7fb] px-2.5 py-2 text-[0.8rem] font-bold">
+                  <h3 className="mb-3 flex items-center gap-2 rounded-lg bg-[#f4f7fb] px-2.5 py-2 text-[0.8rem] font-bold">
                     <Icon name="content_paste" className="text-sm text-ink-soft" />
                     Traditional Planning
                   </h3>
@@ -507,7 +512,7 @@ export default async function Home() {
                 </div>
                 <strong className="justify-self-center text-navy">VS</strong>
                 <div>
-                  <h3 className="mb-3 flex items-center gap-2 rounded-[5px] bg-[#f4f7fb] px-2.5 py-2 text-[0.8rem] font-bold">
+                  <h3 className="mb-3 flex items-center gap-2 rounded-lg bg-[#f4f7fb] px-2.5 py-2 text-[0.8rem] font-bold">
                     <Icon name="smart_toy" className="text-sm text-ink-soft" />
                     Voyagoa
                   </h3>
@@ -528,11 +533,11 @@ export default async function Home() {
                 src="/assets/traveler.png"
                 alt="Traveler with arms outstretched facing a mountain lake"
                 fill
-                className="object-cover"
+                className="kenburns object-cover"
                 sizes="(max-width: 1024px) 100vw, 45vw"
               />
               <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(236,245,255,0.86),rgba(236,245,255,0.05))]" />
-              <div className="absolute left-10 top-16 z-10 max-w-[260px]">
+              <div className="absolute left-10 top-16 z-10 max-w-[260px] [&_p]:mt-3">
                 <h2 className="font-display text-[1.72rem] leading-[1.08]">
                   Less planning.
                   <br />
@@ -548,16 +553,19 @@ export default async function Home() {
         </Shell>
 
         {/* =========================== TESTIMONIALS ======================== */}
-        <Shell className="pb-5 pt-9">
-          <CenterHeading eyebrow="TRUSTED BY TRAVELERS" title="Real travelers. Real stories." />
-          <div className="mt-3 grid gap-5 md:grid-cols-3">
+        <Shell className="pb-24 sm:pb-36">
+          <div data-reveal>
+            <CenterHeading eyebrow="TRUSTED BY TRAVELERS" title="Real travelers. Real stories." />
+          </div>
+          <div className="mt-14 grid gap-5 md:grid-cols-3" data-reveal-stagger>
             {TESTIMONIALS.map((t) => (
               <article
                 key={t.name}
-                className="min-h-[132px] rounded-lg border border-line bg-white px-5 py-4"
+                className="lift relative min-h-[132px] overflow-hidden rounded-3xl border border-line bg-white px-7 py-7"
               >
-                <div className="mb-2 flex items-center gap-3">
-                  <span className="grid size-8 place-items-center rounded-full bg-[linear-gradient(135deg,#b87558,#2d6cdf)] text-[0.7rem] font-black text-white">
+                <span aria-hidden className="pointer-events-none absolute -right-1 -top-6 font-display text-[7rem] leading-none text-blue/[0.07]">&rdquo;</span>
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="grid size-10 place-items-center rounded-full bg-[linear-gradient(135deg,#b87558,#2d6cdf)] text-[0.7rem] font-black text-white">
                     {t.initials}
                   </span>
                   <div>
@@ -565,7 +573,7 @@ export default async function Home() {
                     <small className="block text-[0.7rem] text-ink-soft">{t.where}</small>
                   </div>
                 </div>
-                <p className="mb-2 text-[0.86rem]">&ldquo;{t.quote}&rdquo;</p>
+                <p className="mb-4 text-[0.92rem] leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                 <div className="text-[0.9rem] text-yellow" aria-label="Five stars">
                   ★ ★ ★ ★ ★
                 </div>
@@ -575,8 +583,8 @@ export default async function Home() {
         </Shell>
 
         {/* ============================== TEAM ============================= */}
-        <Shell className="pb-8 pt-7">
-          <div id="team" className="scroll-mt-24">
+        <Shell className="pb-24 sm:pb-36">
+          <div id="team" className="scroll-mt-24" data-reveal>
             <CenterHeading
               eyebrow="MEET THE TEAM"
               title="Meet the people behind Voyagoa"
@@ -584,36 +592,38 @@ export default async function Home() {
             />
           </div>
 
-          <div className="mx-auto mt-5 grid max-w-4xl gap-5 md:grid-cols-2">
+          <div className="mx-auto mt-14 grid max-w-3xl gap-6 sm:grid-cols-2" data-reveal-stagger>
             {TEAM.map((m) => (
-              <article
-                key={m.name}
-                className="rounded-lg border border-line bg-white p-5 text-center shadow-[0_18px_42px_rgba(12,43,97,0.08)] transition hover:-translate-y-[3px] hover:shadow-[0_26px_54px_rgba(12,43,97,0.13)]"
+              <Link
+                key={m.slug}
+                href={`/team#${m.slug}`}
+                className="lift group block rounded-3xl border border-line bg-white px-6 pb-8 pt-10 text-center shadow-[0_18px_42px_rgba(12,43,97,0.06)]"
               >
-                <div
-                  className={`mx-auto mb-3 grid size-24 place-items-center rounded-full border border-white/70 text-[1.6rem] font-black text-white shadow-[0_20px_45px_rgba(17,103,241,0.24)] ${m.avatar}`}
-                >
-                  {m.initials}
-                </div>
-                <span className="inline-flex min-h-6 items-center rounded-full bg-blue-soft px-3 text-[0.72rem] font-black text-blue">
+                <TeamAvatar src={m.photo} initials={m.initials} name={m.name} className={m.avatar} />
+                <span className="mt-5 inline-flex min-h-6 items-center rounded-full bg-blue-soft px-3 text-[0.72rem] font-black text-blue">
                   {m.role}
                 </span>
-                <h3 className="mb-0.5 mt-2 font-display text-[1.15rem] text-navy">{m.name}</h3>
-                <p className="mb-2.5 text-[0.8rem] font-extrabold text-ink-soft">{m.title}</p>
-                <p className="mx-auto mb-3 max-w-[380px] text-[0.84rem] text-[#334560]">{m.bio}</p>
-                <SocialRow label={`${m.name} social links`} />
-                <a
-                  href={`mailto:${m.email}`}
-                  className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg border border-blue bg-white px-4 text-[0.82rem] font-extrabold text-blue transition hover:-translate-y-px hover:bg-blue-soft"
-                >
-                  <Icon name="mail" className="text-[17px]" />
-                  Contact
-                </a>
-              </article>
+                <h3 className="mt-3 font-display text-[1.2rem] text-navy">{m.name}</h3>
+                <p className="mt-1 text-[0.82rem] font-bold text-ink-soft">{m.title}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-[0.84rem] font-extrabold text-blue">
+                  View profile
+                  <Icon name="arrow_forward" className="text-[17px] transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
             ))}
           </div>
 
-          <article className="mt-6 grid items-center gap-6 rounded-lg border border-line bg-white px-7 py-6 shadow-[0_18px_42px_rgba(12,43,97,0.08)] md:grid-cols-[1.25fr_0.75fr]">
+          <div className="mt-12 flex justify-center" data-reveal>
+            <Link
+              href="/team"
+              className="btn-shine inline-flex min-h-12 items-center gap-2 rounded-full bg-navy px-7 text-[0.92rem] font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-ink"
+            >
+              Meet the whole team
+              <Icon name="arrow_forward" className="text-[18px]" />
+            </Link>
+          </div>
+
+          <article data-reveal className="mt-24 grid items-center gap-8 rounded-[2rem] border border-line bg-white px-8 py-10 shadow-[0_18px_42px_rgba(12,43,97,0.08)] sm:px-12 md:grid-cols-[1.25fr_0.75fr]">
             <div>
               <span className="text-[0.68rem] font-black text-blue">CONNECT WITH US</span>
               <h3 className="mb-2 mt-1 font-display text-[1.35rem]">
@@ -645,21 +655,21 @@ export default async function Home() {
         </Shell>
 
         {/* =========================== FAQ + CTA =========================== */}
-        <Shell className="grid gap-8 pb-9 lg:grid-cols-2">
-          <article id="faqs" className="min-h-[262px] scroll-mt-24 rounded-lg border border-line bg-white px-7 py-5">
+        <Shell className="grid gap-10 pb-28 sm:pb-40 lg:grid-cols-2" data-reveal-stagger>
+          <article id="faqs" className="min-h-[262px] scroll-mt-24 rounded-[2rem] border border-line bg-white px-8 py-9 sm:px-10">
             <span className="text-[0.68rem] font-black text-blue">FAQS</span>
-            <h2 className="mb-3.5 font-display text-[1.35rem] leading-[1.08]">
+            <h2 className="mb-6 mt-2 font-display text-[1.5rem] leading-[1.08]">
               Frequently asked questions
             </h2>
             <Faq />
           </article>
 
-          <article className="relative grid min-h-[262px] place-items-center overflow-hidden rounded-lg bg-navy text-center text-white">
+          <article className="relative grid min-h-[300px] place-items-center overflow-hidden rounded-[2rem] bg-navy text-center text-white">
             <Image
               src="/assets/cta-bg.jpg"
               alt=""
               fill
-              className="object-cover opacity-[0.58]"
+              className="slow-zoom object-cover opacity-[0.58]"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,16,34,0.62),rgba(4,16,34,0.92))]" />
@@ -673,15 +683,15 @@ export default async function Home() {
               </p>
               <div className="mb-3 flex flex-col justify-center gap-3.5 sm:flex-row">
                 <Link
-                  href="/#start"
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue px-6 font-extrabold text-white shadow-[0_12px_28px_rgba(17,103,241,0.22)] transition hover:-translate-y-px hover:bg-blue-dark"
+                  href="/plan"
+                  className="btn-shine inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-blue px-7 font-extrabold text-white shadow-[0_12px_28px_rgba(17,103,241,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-dark"
                 >
                   <Icon name="auto_awesome" className="text-[17px]" />
                   Plan My Trip
                 </Link>
                 <Link
                   href={user ? "/trips" : "/register"}
-                  className="inline-flex min-h-11 min-w-[156px] items-center justify-center rounded-lg border border-white/75 bg-white/[0.04] px-6 font-extrabold text-white transition hover:-translate-y-px hover:bg-white/10"
+                  className="inline-flex min-h-12 min-w-[156px] items-center justify-center rounded-full border border-white/75 bg-white/[0.04] px-6 font-extrabold text-white transition hover:-translate-y-px hover:bg-white/10"
                 >
                   {user ? "My Trips" : "See a Demo"}
                 </Link>

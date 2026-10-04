@@ -23,6 +23,14 @@ const NETWORKS = {
 
 export type Network = keyof typeof NETWORKS;
 
+export function LinkedInGlyph({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d={NETWORKS.linkedin.path} />
+    </svg>
+  );
+}
+
 export function SocialRow({
   label,
   networks = ["facebook", "linkedin", "instagram"],

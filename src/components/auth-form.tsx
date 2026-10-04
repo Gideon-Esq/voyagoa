@@ -54,7 +54,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     }
 
     // If the user arrived mid-composition, send them back to finish planning.
-    router.push(fromComposer ? "/" : "/trips");
+    router.push(fromComposer ? "/plan" : "/trips");
     router.refresh();
   }
 

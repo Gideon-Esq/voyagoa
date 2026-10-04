@@ -37,7 +37,7 @@ export default async function SharedTripPage({
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <span className="font-display text-xl font-semibold">Voyagoa</span>
           <Link
-            href="/"
+            href="/plan"
             className="rounded-full bg-blue px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-dark"
           >
             Plan your own trip

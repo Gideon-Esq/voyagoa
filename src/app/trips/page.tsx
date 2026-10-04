@@ -32,7 +32,7 @@ export default async function TripsPage() {
         <div className="flex items-center justify-between">
           <h1 className="font-display text-3xl font-semibold">My trips</h1>
           <Link
-            href="/"
+            href="/plan"
             className="rounded-full bg-blue px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-dark"
           >
             + Plan a new trip
